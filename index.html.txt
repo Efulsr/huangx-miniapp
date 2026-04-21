@@ -1,0 +1,793 @@
+index.html
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>HUANGX - Imperial Slot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: #000000;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: #FFF5B7;
+            min-height: 100vh;
+            padding: 16px;
+            padding-bottom: 80px;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+            border-radius: 20px;
+            border: 1px solid #C5A028;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid #C5A028;
+            box-shadow: 0 0 10px rgba(197, 160, 40, 0.5);
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .balance-container {
+            text-align: right;
+        }
+
+        .balance-label {
+            font-size: 12px;
+            color: #C5A028;
+            display: block;
+        }
+
+        .balance-value {
+            font-size: 28px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #FFF5B7, #C5A028);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* Slot Machine */
+        .slot-machine {
+            background: linear-gradient(145deg, #0a0a0a, #000000);
+            border-radius: 32px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid #C5A028;
+            box-shadow: 0 0 20px rgba(197, 160, 40, 0.2);
+        }
+
+        .reels {
+            display: flex;
+            justify-content: space-around;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .reel {
+            width: 80px;
+            height: 80px;
+            background: #111;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            border: 2px solid #C5A028;
+            box-shadow: inset 0 0 10px rgba(197, 160, 40, 0.3);
+            transition: all 0.1s;
+        }
+
+        .spin-btn {
+            width: 100%;
+            padding: 18px;
+            font-size: 20px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #C5A028, #8B6914);
+            border: none;
+            border-radius: 48px;
+            color: #000;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .spin-btn:active {
+            transform: scale(0.98);
+        }
+
+        .spin-btn:disabled {
+            opacity: 0.5;
+            transform: none;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+
+        .action-btn {
+            flex: 1;
+            min-width: 70px;
+            padding: 12px 8px;
+            background: #111;
+            border: 1px solid #C5A028;
+            border-radius: 40px;
+            color: #FFF5B7;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .action-btn:active {
+            background: #C5A028;
+            color: #000;
+        }
+
+        /* Info Panel */
+        .info-panel {
+            text-align: center;
+            padding: 16px;
+            background: rgba(197, 160, 40, 0.1);
+            border-radius: 16px;
+            font-size: 12px;
+            color: #C5A028;
+        }
+
+        /* Animasi Spin */
+        @keyframes spinReel {
+            0% { transform: translateY(0); opacity: 1; }
+            50% { transform: translateY(-20px); opacity: 0.5; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        .spinning {
+            animation: spinReel 0.1s ease-in-out infinite;
+        }
+
+        /* Modal Leaderboard */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(145deg, #0a0a0a, #000000);
+            border: 2px solid #C5A028;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 400px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 20px;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #C5A028;
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+        }
+
+        .modal-header h2 {
+            font-size: 20px;
+            background: linear-gradient(135deg, #FFF5B7, #C5A028);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .close-btn {
+            font-size: 28px;
+            cursor: pointer;
+            color: #C5A028;
+        }
+
+        .leaderboard-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 8px;
+            background: #111;
+            border: 1px solid #C5A028;
+            border-radius: 20px;
+            color: #FFF5B7;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background: #C5A028;
+            color: #000;
+        }
+
+        .leaderboard-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            border-bottom: 1px solid #C5A02830;
+        }
+
+        .rank-number {
+            width: 40px;
+            font-weight: bold;
+            color: #C5A028;
+        }
+
+        .rank-1 .rank-number { color: #FFD700; font-size: 20px; }
+        .rank-2 .rank-number { color: #C0C0C0; font-size: 18px; }
+        .rank-3 .rank-number { color: #CD7F32; font-size: 16px; }
+
+        .rank-name {
+            flex: 1;
+            font-size: 14px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .rank-coins {
+            font-weight: bold;
+            color: #FFF5B7;
+        }
+
+        .my-rank {
+            margin-top: 20px;
+            padding: 12px;
+            background: #C5A02820;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid #C5A028;
+            font-weight: bold;
+        }
+
+        .reward-info {
+            margin-top: 20px;
+            padding: 12px;
+            background: #0a0a0a;
+            border-radius: 12px;
+            border: 1px solid #C5A02840;
+        }
+
+        .reward-info summary {
+            cursor: pointer;
+            color: #C5A028;
+            font-weight: bold;
+            text-align: center;
+            padding: 8px;
+        }
+
+        .reward-table {
+            margin-top: 12px;
+            padding: 8px;
+        }
+
+        .reward-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid #C5A02820;
+            font-size: 14px;
+        }
+
+        .sol-amount {
+            color: #00FFAA;
+            font-weight: bold;
+        }
+
+        .reward-note {
+            font-size: 11px;
+            text-align: center;
+            margin-top: 12px;
+            color: #C5A02880;
+        }
+
+        .toast {
+            margin-top: 8px;
+            color: #FFF5B7;
+            background: #C5A02820;
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 12px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #C5A028;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">🐋👑</div>
+        <div class="balance-container">
+            <span class="balance-label">👑 Koin HUANGX</span>
+            <span class="balance-value" id="coinBalance">0</span>
+        </div>
+    </div>
+
+    <!-- Slot Machine -->
+    <div class="slot-machine">
+        <div class="reels" id="reels">
+            <div class="reel" id="reel1">🎰</div>
+            <div class="reel" id="reel2">🎰</div>
+            <div class="reel" id="reel3">🎰</div>
+        </div>
+        <button class="spin-btn" id="spinBtn">🎲 SPIN IMPERIAL 🎲</button>
+    </div>
+
+    <!-- Tombol Aksi -->
+    <div class="action-buttons">
+        <button class="action-btn" id="collectBtn">🏦 Kumpul</button>
+        <button class="action-btn" id="shopBtn">🛒 Toko</button>
+        <button class="action-btn" id="walletBtn">💎 Wallet</button>
+        <button class="action-btn" id="leaderboardBtn">🏆 Peringkat</button>
+        <button class="action-btn" id="claimRewardBtn">🎁 Claim</button>
+    </div>
+
+    <!-- Info Panel -->
+    <div class="info-panel" id="infoPanel">
+        <p>✨ Spin gratis setiap 10 menit ✨</p>
+        <p id="nextSpinTimer"></p>
+    </div>
+
+    <!-- Modal Leaderboard -->
+    <div id="leaderboardModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🏆 Peringkat HUANGX 🏆</h2>
+                <span class="close-btn" id="closeModalBtn">&times;</span>
+            </div>
+            <div class="leaderboard-tabs">
+                <button class="tab-btn active" data-tab="daily">📅 Harian</button>
+                <button class="tab-btn" data-tab="weekly">📆 Mingguan</button>
+                <button class="tab-btn" data-tab="alltime">👑 Sepanjang Masa</button>
+            </div>
+            <div id="leaderboardContent">
+                <div class="loading">Memuat peringkat...</div>
+            </div>
+            <div class="my-rank" id="myRank">
+                Peringkat Anda: -
+            </div>
+            <div class="reward-info">
+                <details>
+                    <summary>🏆 Info Hadiah Mingguan 🏆</summary>
+                    <div class="reward-table">
+                        <div class="reward-row">🥇 Peringkat 1: <span class="sol-amount">100 SOL</span></div>
+                        <div class="reward-row">🥈 Peringkat 2: <span class="sol-amount">50 SOL</span></div>
+                        <div class="reward-row">🥉 Peringkat 3: <span class="sol-amount">25 SOL</span></div>
+                        <div class="reward-row">#4: <span class="sol-amount">5 SOL</span></div>
+                        <div class="reward-row">#5: <span class="sol-amount">2.5 SOL</span></div>
+                        <div class="reward-row">#6 - #15: <span class="sol-amount">1 SOL</span></div>
+                    </div>
+                    <p class="reward-note">✨ Hadiah dibagikan setiap hari Minggu pukul 23:59 WIB ✨</p>
+                </details>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== KONFIGURASI ====================
+        const HUANGX_CONFIG = {
+            SOLANA_WALLET: 'H4ZzmkFJS3eoZo9FjGrSiKWUz7cidwLpXi56BzKsUUug',
+            API_BASE_URL: 'https://huangx-api.vercel.app' // Nanti diganti
+        };
+
+        // State game
+        let userData = {
+            userId: null,
+            userName: 'Player',
+            coins: 100,
+            spinTokens: 3,
+            lastSpinTime: Date.now(),
+            boosters: [],
+            solanaWallet: null
+        };
+
+        // Simbol dan reward
+        const symbols = ['🐟', '🐠', '🐡', '🪙', '🐋', '👑'];
+        const rewards = {
+            '🐟': 10, '🐠': 20, '🐡': 30, '🪙': 50, '🐋': 150, '👑': 1000
+        };
+
+        // Hadiah leaderboard
+        const LEADERBOARD_REWARDS = {
+            1: 100, 2: 50, 3: 25, 4: 5, 5: 2.5,
+            defaultRange: { start: 6, end: 15, amount: 1 }
+        };
+
+        let rewardClaims = { weekly: {}, lastResetDate: null };
+
+        // ==================== FUNGSI UTAMA ====================
+        
+        function getRandomSymbol() {
+            const rand = Math.random();
+            if (rand < 0.05) return '👑';
+            if (rand < 0.15) return '🐋';
+            if (rand < 0.35) return '🪙';
+            if (rand < 0.55) return '🐡';
+            if (rand < 0.75) return '🐠';
+            return '🐟';
+        }
+
+        function calculateReward(results) {
+            let total = results.reduce((sum, s) => sum + (rewards[s] || 5), 0);
+            if (userData.boosters.includes('2x_poin')) total *= 2;
+            return total;
+        }
+
+        function displayResults(results) {
+            document.getElementById('reel1').textContent = results[0];
+            document.getElementById('reel2').textContent = results[1];
+            document.getElementById('reel3').textContent = results[2];
+        }
+
+        function showMessage(msg) {
+            const panel = document.getElementById('infoPanel');
+            const oldMsg = panel.querySelector('.toast');
+            if (oldMsg) oldMsg.remove();
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = msg;
+            panel.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function animateSpin() {
+            document.querySelectorAll('.reel').forEach(r => r.classList.add('spinning'));
+        }
+
+        function stopSpinAnimation() {
+            document.querySelectorAll('.reel').forEach(r => r.classList.remove('spinning'));
+        }
+
+        function triggerJackpotEffect() {
+            const originalBg = document.body.style.background;
+            document.body.style.background = 'radial-gradient(circle, #C5A02820, #000000)';
+            setTimeout(() => document.body.style.background = originalBg, 500);
+            if (window.Telegram?.WebApp?.HapticFeedback) {
+                window.Telegram.WebApp.HapticFeedback.impactOccurred('heavy');
+            }
+        }
+
+        function updateUI() {
+            document.getElementById('coinBalance').textContent = userData.coins.toLocaleString();
+            const spinBtn = document.getElementById('spinBtn');
+            spinBtn.textContent = userData.spinTokens > 0 ? '🎲 SPIN IMPERIAL 🎲' : '⏳ TUNGGU SPIN TOKEN ⏳';
+        }
+
+        // ==================== SPIN ====================
+        async function spin() {
+            const spinBtn = document.getElementById('spinBtn');
+            if (userData.spinTokens <= 0) {
+                showMessage('⏳ Spin token habis! Tunggu 10 menit atau beli booster.');
+                return;
+            }
+            
+            spinBtn.disabled = true;
+            animateSpin();
+            
+            setTimeout(() => {
+                const results = [getRandomSymbol(), getRandomSymbol(), getRandomSymbol()];
+                displayResults(results);
+                const reward = calculateReward(results);
+                
+                userData.coins += reward;
+                userData.spinTokens--;
+                userData.lastSpinTime = Date.now();
+                
+                saveUserData();
+                updateUI();
+                
+                if (results[0] === '👑' && results[1] === '👑' && results[2] === '👑') {
+                    showMessage('👑🔥 IMPERIAL HUANGX JACKPOT! +5000 KOIN! 🔥👑');
+                    userData.coins += 5000;
+                    saveUserData();
+                    updateUI();
+                    triggerJackpotEffect();
+                } else if (results.includes('👑')) {
+                    showMessage(`✨ Logo HUANGX muncul! +${reward} koin ✨`);
+                } else {
+                    showMessage(`🎉 Kamu mendapat ${reward} koin!`);
+                }
+                
+                spinBtn.disabled = false;
+                stopSpinAnimation();
+                updateLeaderboard();
+            }, 800);
+        }
+
+        // ==================== KOIN PASIF ====================
+        function collectPassiveCoins() {
+            const passiveReward = 50 + (userData.boosters.includes('auto_collect') ? 100 : 0);
+            userData.coins += passiveReward;
+            saveUserData();
+            updateUI();
+            showMessage(`🏦 Kamu mengumpulkan ${passiveReward} koin pasif!`);
+        }
+
+        // ==================== TIMER ====================
+        function startSpinTimer() {
+            setInterval(() => {
+                const timeSinceLastSpin = (Date.now() - userData.lastSpinTime) / 1000;
+                const timeLeft = 600 - timeSinceLastSpin;
+                
+                if (timeLeft <= 0 && userData.spinTokens === 0) {
+                    userData.spinTokens = 1;
+                    saveUserData();
+                    updateUI();
+                    showMessage('✨ Kamu mendapat 1 Spin Token gratis! ✨');
+                }
+                
+                const minutes = Math.floor(Math.max(0, timeLeft) / 60);
+                const seconds = Math.floor(Math.max(0, timeLeft) % 60);
+                document.getElementById('nextSpinTimer').textContent = 
+                    `Spin berikutnya: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        // ==================== LEADERBOARD ====================
+        function updateLeaderboard() {
+            let allPlayers = JSON.parse(localStorage.getItem('huangx_leaderboard') || '[]');
+            const existingIndex = allPlayers.findIndex(p => p.userId === userData.userId);
+            const playerData = {
+                userId: userData.userId,
+                name: userData.userName,
+                coins: userData.coins,
+                lastUpdate: Date.now()
+            };
+            
+            if (existingIndex !== -1) allPlayers[existingIndex] = playerData;
+            else allPlayers.push(playerData);
+            
+            allPlayers.sort((a, b) => b.coins - a.coins);
+            localStorage.setItem('huangx_leaderboard', JSON.stringify(allPlayers.slice(0, 100)));
+            
+            if (document.getElementById('leaderboardModal').style.display === 'flex') {
+                loadLeaderboardTab('daily');
+            }
+        }
+
+        function loadLeaderboardTab(tabType) {
+            const allPlayers = JSON.parse(localStorage.getItem('huangx_leaderboard') || '[]');
+            const contentDiv = document.getElementById('leaderboardContent');
+            
+            if (allPlayers.length === 0) {
+                contentDiv.innerHTML = '<div class="loading">Belum ada pemain. Ajak teman main!</div>';
+                return;
+            }
+            
+            let filteredPlayers = [...allPlayers];
+            if (tabType === 'daily') {
+                const today = new Date().toDateString();
+                filteredPlayers = allPlayers.filter(p => new Date(p.lastUpdate).toDateString() === today);
+                if (filteredPlayers.length === 0) filteredPlayers = allPlayers.slice(0, 10);
+            }
+            if (tabType === 'weekly') {
+                const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+                filteredPlayers = allPlayers.filter(p => p.lastUpdate > weekAgo);
+                if (filteredPlayers.length === 0) filteredPlayers = allPlayers.slice(0, 10);
+            }
+            
+            filteredPlayers.sort((a, b) => b.coins - a.coins);
+            const topPlayers = filteredPlayers.slice(0, 10);
+            
+            let html = '<ul class="leaderboard-list">';
+            topPlayers.forEach((player, idx) => {
+                const rank = idx + 1;
+                let rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : '';
+                html += `
+                    <li class="leaderboard-item ${rankClass}">
+                        <div class="rank-number">${rank === 1 ? '👑' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`}</div>
+                        <div class="rank-name">${escapeHtml(player.name)}</div>
+                        <div class="rank-coins">${player.coins.toLocaleString()} 🪙</div>
+                    </li>
+                `;
+            });
+            html += '</ul>';
+            if (topPlayers.length === 0) html = '<div class="loading">Belum ada data</div>';
+            contentDiv.innerHTML = html;
+            updateMyRank();
+        }
+
+        function updateMyRank() {
+            const allPlayers = JSON.parse(localStorage.getItem('huangx_leaderboard') || '[]');
+            allPlayers.sort((a, b) => b.coins - a.coins);
+            const myPosition = allPlayers.findIndex(p => p.userId === userData.userId) + 1;
+            const rankText = myPosition > 0 ? `#${myPosition} dari ${allPlayers.length} pemain` : 'Belum terdaftar';
+            document.getElementById('myRank').innerHTML = `📊 Peringkat Anda: ${rankText} | Total: ${userData.coins.toLocaleString()} 🪙`;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ==================== HADIAH ====================
+        function getWeekNumber(date) {
+            const d = new Date(date);
+            d.setHours(0, 0, 0, 0);
+            d.setDate(d.getDate() + 3 - (d.getDay() + 6) % 7);
+            const week1 = new Date(d.getFullYear(), 0, 4);
+            return 1 + Math.round(((d - week1) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+        }
+
+        function loadRewardClaims() {
+            const saved = localStorage.getItem('huangx_reward_claims');
+            if (saved) rewardClaims = JSON.parse(saved);
+            if (!rewardClaims.weekly) rewardClaims.weekly = {};
+            if (!rewardClaims.lastResetDate) rewardClaims.lastResetDate = null;
+        }
+
+        function saveRewardClaims() {
+            localStorage.setItem('huangx_reward_claims', JSON.stringify(rewardClaims));
+        }
+
+        async function claimReward() {
+            if (!userData.userId) {
+                showMessage('❌ Silakan buka game dari Telegram terlebih dahulu!');
+                return;
+            }
+            
+            const currentWeekId = getWeekNumber(new Date());
+            const claimKey = `${currentWeekId}_${userData.userId}`;
+            const myReward = rewardClaims.weekly[claimKey];
+            
+            if (!myReward) {
+                showMessage('❌ Kamu tidak memenangkan hadiah minggu ini. Coba lagi minggu depan!');
+                return;
+            }
+            
+            if (myReward.claimed) {
+                showMessage('✅ Hadiah sudah pernah diklaim!');
+                return;
+            }
+            
+            showMessage(`🎉 Selamat! Anda mendapat ${myReward.amount} SOL! Hubungi @HuangXBot untuk klaim.`);
+            myReward.claimed = true;
+            saveRewardClaims();
+        }
+
+        function setUserWallet(walletAddress) {
+            userData.solanaWallet = walletAddress;
+            saveUserData();
+            showMessage(`💎 Wallet disimpan: ${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`);
+        }
+
+        // ==================== SIMPAN DATA ====================
+        function saveUserData() {
+            localStorage.setItem('huangx_user', JSON.stringify(userData));
+            updateLeaderboard();
+        }
+
+        function loadUserData() {
+            const saved = localStorage.getItem('huangx_user');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                userData = { ...userData, ...parsed };
+            }
+            
+            if (window.Telegram?.WebApp?.initDataUnsafe?.user) {
+                const tgUser = window.Telegram.WebApp.initDataUnsafe.user;
+                userData.userName = tgUser.username || tgUser.first_name || `Player_${String(tgUser.id).slice(-4)}`;
+                userData.userId = tgUser.id;
+            } else {
+                userData.userId = userData.userId || 'guest_' + Math.random().toString(36).substr(2, 6);
+            }
+        }
+
+        // ==================== TOKO & WALLET ====================
+        function openShop() {
+            showMessage('🛒 Toko booster: 2x Poin (1 SOL) | Auto-Spin (3 SOL) - Segera hadir!');
+        }
+
+        function connectWallet() {
+            const fakeWallet = 'HUANGX_' + Math.random().toString(36).substr(2, 8);
+            setUserWallet(fakeWallet);
+            showMessage('💎 Wallet demo terhubung! (Fitur penuh segera hadir)');
+        }
+
+        // ==================== TELEGRAM INTEGRASI ====================
+        function initTelegram() {
+            if (window.Telegram?.WebApp) {
+                const tg = window.Telegram.WebApp;
+                tg.expand();
+                tg.ready();
+                if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+            }
+        }
+
+        // ==================== INIT LEADERBOARD MODAL ====================
+        function initLeaderboard() {
+            const modal = document.getElementById('leaderboardModal');
+            const openBtn = document.getElementById('leaderboardBtn');
+            const closeBtn = document.getElementById('closeModalBtn');
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            
+            openBtn.addEventListener('click', () => {
+                modal.style.display = 'flex';
+                loadLeaderboardTab('daily');
+            });
+            
+            closeBtn.addEventListener('click', () => modal.style.display = 'none');
+            modal.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+            
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    loadLeaderboardTab(btn.dataset.tab);
+                });
+            });
+        }
+
+        // ==================== START GAME ====================
+        function initGame() {
+            initTelegram();
+            loadUserData();
+            loadRewardClaims();
+            updateUI();
+            startSpinTimer();
+            initLeaderboard();
+            
+            document.getElementById('spinBtn').addEventListener('click', spin);
+            document.getElementById('collectBtn').addEventListener('click', collectPassiveCoins);
+            document.getElementById('shopBtn').addEventListener('click', openShop);
+            document.getElementById('walletBtn').addEventListener('click', connectWallet);
+            document.getElementById('claimRewardBtn').addEventListener('click', claimReward);
+            
+            showMessage('🐋👑 Selamat datang di HUANGX! Spin dan kumpulkan koin!');
+        }
+
+        // Mulai game
+        initGame();
+    </script>
+</body>
+</html>
